@@ -1,0 +1,103 @@
+# Lighthouse report: Microsoft Corporation (MSFT)
+*As of 2017-11-10 · price $83.87 · investor: long-term, balanced risk, max loss 2.0% of a $25,000 portfolio*
+
+## Verdict: **Strong Buy** — Lighthouse score 73 / 100
+Open or add to a position - the evidence lines up across fundamentals, technicals and the market backdrop.
+
+### How the score is built
+- Fundamental score **63** × weight 60% = 38.0
+- Technical score **88** × weight 40% = 35.2
+- Market-weather adjustment: **0** (Bull / Calm)
+- **Composite = 73.2** → Strong Buy (bands: ≥72 Strong Buy, ≥60 Buy, ≥45 Hold, ≥32 Reduce, else Sell)
+
+### Fundamental beacons (score 63)
+*Technology · Software - Infrastructure · data: offline_fixture (approximate, from memory of 10-K filings; demonstration only) (2017-11-10)*
+
+| signal | reading | light | vote | weight | points | why |
+|---|---|---|---|---|---|---|
+| Price / Earnings (trailing) | P/E 28.4 vs Technology ~28 | 🟡 | -0.03 | 7% | -0.1 | Trailing P/E of 28.4 is above the typical Technology multiple (~28): you pay more per dollar of earnings than for a typical peer. |
+| Price / Earnings (forward) | fwd P/E 24.0 | 🟡 | +0.10 | 7% | +0.3 | Analysts' next-12-month earnings put the forward P/E at 24.0; cheaper than the sector norm after expected growth. |
+| PEG ratio | PEG 2.00 | 🔴 | -0.50 | 7% | -1.7 | PEG well above 1.5 means investors pay a premium that growth alone does not justify. |
+| Price / Book | P/B 8.50 vs ~7.0 | 🔴 | -0.36 | 7% | -1.2 | Price-to-book of 8.50 is above the Technology norm; for asset-light companies this is a secondary check. |
+| EV / EBITDA | EV/EBITDA 18.5 vs ~20 | 🟡 | +0.15 | 7% | +0.5 | Enterprise value per dollar of operating cash earnings, which is capital-structure neutral, is below the sector norm. |
+| Earnings stability (annual EPS) | EPS volatility 20% of mean over 5 years | 🟢 | +0.43 | 7% | +1.4 | Annual earnings have been steady, which makes the P/E multiple more trustworthy. |
+| Return on equity | ROE 29.0% | 🟢 | +1.00 | 7% | +3.5 | Return on equity above 20% signals a business that compounds shareholder capital efficiently. |
+| Operating margin | op. margin 25.0% vs ~22.0% | 🟡 | +0.20 | 7% | +0.7 | Operating margin is above the Technology norm, which suggests pricing power or cost advantages. |
+| Debt / Equity | D/E 1.15 | 🟡 | -0.15 | 7% | -0.5 | Debt above equity: leverage amplifies both profits and losses, and raises refinancing risk. |
+| Free-cash-flow yield | FCF yield 4.9% | 🟢 | +0.63 | 7% | +2.2 | Free cash flow relative to market value: above 5% is a genuine cash return; below 1% means the price relies on future growth rather than cash generated today. |
+| Current ratio | current ratio 2.90 | 🟢 | +0.50 | 7% | +1.7 | Short-term assets cover short-term liabilities. |
+| Revenue growth (YoY) | revenue 5.4% | 🟡 | +0.03 | 12% | +0.2 | Revenue growing around the pace of the economy. |
+| EPS growth (YoY) | EPS 29.0% | 🟢 | +1.00 | 12% | +6.2 | Earnings per share are growing faster than the market's long-run ~8%. |
+
+### Technical beacons (score 88)
+| signal | reading | light | vote | weight | points | why |
+|---|---|---|---|---|---|---|
+| Trend (50/200-day SMA) | price +19.2% vs 200-SMA; Golden Cross (50 > 200) | 🟢 | +1.00 | 35% | +17.5 | Price is above its 200-day average and the 50-day sits above the 200-day: the long-term trend is up. |
+| Momentum (RSI 14) | RSI 74.9 | 🟢 | +0.67 | 15% | +5.1 | RSI above 70 is overbought: momentum is strong but stretched, so the signal fades. |
+| MACD (12/26/9) | histogram +0.06 (+0.05 ATR) | 🟡 | +0.05 | 10% | +0.3 | MACD line is above its signal line: short-term momentum is accelerating upward. |
+| Bollinger Bands (20, 2σ) | %B 0.72 | 🟢 | +0.43 | 10% | +2.2 | Price sits in the upper half of its Bollinger Bands: buyers are in control without over-extension. |
+| Volume confirmation (OBV, 20/60-day) | volume 1.20x avg; OBV up | 🟢 | +0.70 | 10% | +3.5 | Recent volume is 1.20x its 3-month average and on-balance volume is rising: the move is confirmed by participation. |
+| 52-week high proximity | -0.8% from 52-week high | 🟢 | +0.96 | 20% | +9.6 | Trading at or near its 52-week high: a breakout zone where trend-followers add exposure. |
+
+### Market weather
+Market weather is Bull / Calm: the S&P 500 is above its 200-day average (up-trend) and realised volatility (5%) is near or below its one-year norm (7%).
+
+### Position plan
+- Buy about **21 shares** (~$1,768, 7.1% of the portfolio) near $83.87.
+- Exit level **$64.73** (22.8% below): worst case ≈ $403 (1.61% of the portfolio, limit 2%).
+- Size was limited by the **max-loss rule**.
+  - Exit level 22.8% below the current price at $64.73 (200-day SMA minus 8% buffer).
+  - Max-loss rule: losing 2% of the portfolio at the stop caps the position at 8.8%.
+  - Volatility rule: 16% realised vol vs a 15% target caps the position at 93.9%.
+  - Scaled by conviction 0.81 (score 73) and market-regime multiplier 1.
+
+### How this rule behaved in the past (2002-09-04 → 2017-11-10)
+Long-only, reviewed monthly at the close, filled at the next open, 10 bps commission + slippage per side, statements lagged 90 days. Returns are for the capital allocated to this stock.
+
+|  | Total return | CAGR | Volatility | Sharpe | Sortino | Max drawdown | Calmar | Trades | Win rate | Avg win | Avg loss | Profit Factor | Time invested | Years |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Lighthouse strategy | 70.9% | 3.6% | 13.1% | 0.18 | 0.21 | -28.7% | 0.13 | 7 | 57.1% | 30.0% | -2.7% | 15.05 | 53.9% | 15.2 |
+| Buy & hold | 362.4% | 10.6% | 26.2% | 0.44 | 0.62 | -59.1% | 0.18 | n/a | n/a | n/a | n/a | n/a | n/a | 15.2 |
+| S&P 500 | 189.0% | 7.2% | 18.6% | 0.36 | 0.45 | -56.8% | 0.13 | n/a | n/a | n/a | n/a | n/a | n/a | 15.2 |
+
+**What each layer contributes**
+
+|  | CAGR | Volatility | Sharpe | Max drawdown | Trades | Win rate | Time invested |
+|---|---|---|---|---|---|---|---|
+| Technical signals only (fully invested) | 4.4% | 19.0% | 0.22 | -35.6% | 8 | 50.0% | 75.4% |
+| + market regime filter | 5.8% | 18.7% | 0.29 | -35.6% | 7 | 57.1% | 74.3% |
+| + fundamental gate (point-in-time) | 5.8% | 18.7% | 0.29 | -35.6% | 7 | 57.1% | 74.3% |
+| + volatility-targeted sizing (full Lighthouse) | 3.6% | 13.1% | 0.18 | -28.7% | 7 | 57.1% | 53.9% |
+| Buy & hold | 10.6% | 26.2% | 0.44 | -59.1% | n/a | n/a | n/a |
+| S&P 500 | 7.2% | 18.6% | 0.36 | -56.8% | n/a | n/a | n/a |
+
+**Behaviour by market regime** (annualised daily returns)
+
+| regime | Days | Share of time | Strategy ann. return | Buy & hold ann. return | Avg exposure |
+|---|---|---|---|---|---|
+| Bull / Calm | 2496 | 65.2% | 8.6% | 22.9% | 65.5% |
+| Bear / Turbulent | 564 | 14.7% | -16.8% | -30.5% | 21.0% |
+| Bear / Calm | 391 | 10.2% | -13.2% | -19.6% | 16.0% |
+| Bull / Turbulent | 375 | 9.8% | 26.6% | 51.6% | 66.1% |
+
+**Out-of-sample check** (thresholds tuned before 2011-10-13, tested after it)
+
+|  | Total return | CAGR | Volatility | Sharpe | Max drawdown | Trades |
+|---|---|---|---|---|---|---|
+| Default rule (60/35) | 67.2% | 8.8% | 13.7% | 0.54 | -26.5% | 3 |
+| Tuned in-sample (55/30) | 67.2% | 8.8% | 13.7% | 0.54 | -26.5% | 3 |
+| Buy & hold | 263.3% | 23.6% | 22.2% | 0.98 | -18.0% | n/a |
+
+**Sensitivity**: across 25 entry/exit threshold pairs the Sharpe ratio ranges from 0.05 (entry 60/exit 45) to 0.20 (entry 65/exit 25); median 0.17.
+
+### Data notes and warnings
+- OFFLINE DATA (sample): series ends 2017-11-10; connect to the internet for live prices
+- Fundamentals come from an offline fixture (offline_fixture (approximate, from memory of 10-K filings; demonstration only)); values are approximate and dated 2017-11-10.
+- Prices: sample; 4,077 trading days 2001-08-29 → 2017-11-10.
+
+### Limitations you should know
+- Sector norms are long-run approximations, not live peer data; a cheap stock in an expensive sector can still be expensive.
+- Fundamentals are the latest reported figures; the backtest's fundamental gate uses only the years of statements the feed provides.
+- The backtest is long-only with simple costs; it ignores taxes, dividends on cash, and intraday stop execution.
+- Past behaviour of a rule is evidence about its *design*, not a promise about its future returns.
+- Lighthouse is a decision-support tool, not investment advice.

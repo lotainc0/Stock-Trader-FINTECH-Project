@@ -1,0 +1,205 @@
+"""
+Decision engine: blend the Fundamental and Technical scores for the investor's
+horizon, apply the market-regime headwind, map the result to a verdict, and
+turn the verdict into a concrete position plan (size, shares, stop, max loss).
+"""
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass, field
+from typing import List, Optional
+
+import numpy as np
+
+from .config import InvestorProfile, StrategyParams, verdict_from_score
+from .regime import RegimeSnapshot, regime_adjustments
+from .technicals import Beacon
+
+ACTION_TEXT = {
+    "Strong Buy": "Open or add to a position - the evidence lines up across fundamentals, technicals and the market backdrop.",
+    "Buy":        "Open a position at the suggested size; the balance of evidence is positive.",
+    "Hold":       "Keep an existing position but do not add new money; the evidence is mixed.",
+    "Reduce":     "Trim an existing position (about half) and do not buy; the evidence leans negative.",
+    "Sell":       "Exit the position; the evidence is clearly negative.",
+}
+
+
+@dataclass
+class PositionPlan:
+    verdict: str
+    position_pct: float          # % of the portfolio to hold in this stock
+    position_value: float
+    shares: int
+    entry_price: float
+    stop_price: Optional[float]
+    stop_pct: Optional[float]    # distance to stop, as a fraction of price
+    max_loss_value: float        # $ lost if the stop is hit
+    conviction: float            # 0-1 scaling from the composite score
+    binding_constraint: str      # which rule limited the size
+    rationale: List[str] = field(default_factory=list)
+
+    @property
+    def action(self) -> str:
+        return ACTION_TEXT.get(self.verdict, "")
+
+
+@dataclass
+class Decision:
+    ticker: str
+    as_of: str
+    price: float
+    profile: InvestorProfile
+    fundamental_score: Optional[float]
+    technical_score: float
+    regime: Optional[RegimeSnapshot]
+    regime_penalty: float
+    composite_score: float
+    verdict: str
+    beacons: List[Beacon]
+    plan: PositionPlan
+    warnings: List[str] = field(default_factory=list)
+
+    @property
+    def fundamental_beacons(self) -> List[Beacon]:
+        return [b for b in self.beacons if b.group == "fundamental"]
+
+    @property
+    def technical_beacons(self) -> List[Beacon]:
+        return [b for b in self.beacons if b.group == "technical"]
+
+    def headline(self) -> str:
+        return (f"{self.ticker}: {self.verdict.upper()} (Lighthouse score {self.composite_score:.0f}/100) "
+                f"for a {self.profile.horizon}-term, {self.profile.risk} investor")
+
+
+# --------------------------------------------------------------------------- #
+# Scoring
+# --------------------------------------------------------------------------- #
+def composite_score(fundamental: Optional[float], technical: float, profile: InvestorProfile,
+                    regime_penalty: float = 0.0) -> float:
+    """Horizon-weighted blend, minus the regime headwind. Missing fundamentals -> technical only."""
+    if fundamental is None or (isinstance(fundamental, float) and np.isnan(fundamental)):
+        blended = technical
+    else:
+        blended = profile.fundamental_weight * fundamental + profile.technical_weight * technical
+    return float(np.clip(blended - regime_penalty, 0.0, 100.0))
+
+
+def conviction_from_score(score: float) -> float:
+    """0 at 45 (bottom of Hold), 1 at 80+. Scales the position size with the strength of the evidence."""
+    return float(np.clip((score - 45.0) / 35.0, 0.0, 1.0))
+
+
+# --------------------------------------------------------------------------- #
+# Position sizing
+# --------------------------------------------------------------------------- #
+def stop_level(price: float, atr: float, sma_slow: Optional[float], profile: InvestorProfile,
+               params: Optional[StrategyParams] = None) -> tuple:
+    """Where the position is abandoned, and why.
+
+    Long horizon : the 200-day SMA minus the exit buffer (the same rule the backtest uses)
+    Short horizon: an ATR trailing stop (risk preset multiple x ATR)
+    """
+    p = params or StrategyParams()
+    atr_ok = atr is not None and np.isfinite(atr) and atr > 0 and price > 0
+    if not p.atr_stop and p.exit_below_sma is not None and sma_slow is not None and np.isfinite(sma_slow):
+        level = sma_slow * (1.0 - p.exit_below_sma)
+        if level < price:
+            return float(level), f"200-day SMA minus {p.exit_below_sma * 100:.0f}% buffer", "sma"
+    if atr_ok:
+        dist = min(max(profile.stop_atr_multiple * atr / price, 0.02), 0.5)
+        return float(price * (1.0 - dist)), f"{profile.stop_atr_multiple:g} x ATR trailing stop", "atr"
+    return None, "no stop (volatility unknown)", "none"
+
+
+def size_position(price: float, atr: float, realized_vol: float, score: float, verdict: str,
+                  profile: InvestorProfile, regime_size_multiplier: float = 1.0, sma_slow: Optional[float] = None,
+                  params: Optional[StrategyParams] = None) -> PositionPlan:
+    """Combine three independent risk rules and take the *smallest* size.
+
+    1. Max-loss rule   : if the stop is hit, lose at most `max_loss_pct` of the portfolio.
+    2. Volatility rule : scale the position so its expected volatility matches the profile's target.
+    3. Concentration   : never exceed the profile's maximum single-position size.
+    The result is then scaled by conviction (score strength) and the regime multiplier.
+    """
+    rationale: List[str] = []
+    stop_price, stop_label, _ = stop_level(price, atr, sma_slow, profile, params)
+    stop_pct: Optional[float] = None
+    if stop_price is not None and price > 0:
+        stop_pct = min(max(1.0 - stop_price / price, 0.01), 0.6)
+        rationale.append(f"Exit level {stop_pct * 100:.1f}% below the current price at ${stop_price:,.2f} ({stop_label}).")
+
+    candidates = {"concentration cap": profile.max_position_pct}
+    if stop_pct:
+        candidates["max-loss rule"] = profile.max_loss_pct / stop_pct
+        rationale.append(f"Max-loss rule: losing {profile.max_loss_pct:g}% of the portfolio at the stop caps the position at "
+                         f"{candidates['max-loss rule']:.1f}%.")
+    if realized_vol and np.isfinite(realized_vol) and realized_vol > 0:
+        rv = max(realized_vol, 0.05)
+        candidates["volatility target"] = 100.0 * profile.target_vol / rv
+        rationale.append(f"Volatility rule: {rv * 100:.0f}% realised vol vs a {profile.target_vol * 100:.0f}% target caps the position at "
+                         f"{candidates['volatility target']:.1f}%.")
+    binding = min(candidates, key=candidates.get)
+    base_pct = candidates[binding]
+
+    conviction = conviction_from_score(score)
+    if verdict in {"Strong Buy", "Buy"}:
+        pct = base_pct * conviction * regime_size_multiplier
+        rationale.append(f"Scaled by conviction {conviction:.2f} (score {score:.0f}) and market-regime multiplier {regime_size_multiplier:g}.")
+    elif verdict == "Hold":
+        pct = 0.0
+        rationale.append("Hold: keep what you own; no new capital.")
+    elif verdict == "Reduce":
+        pct = 0.0
+        rationale.append("Reduce: trim roughly half of an existing position; no new capital.")
+    else:
+        pct = 0.0
+        rationale.append("Sell: exit the position.")
+    pct = float(min(pct, profile.max_position_pct))
+    value = profile.portfolio_value * pct / 100.0
+    shares = int(math.floor(value / price)) if price > 0 else 0
+    max_loss_value = value * (stop_pct or 0.0)
+    return PositionPlan(verdict=verdict, position_pct=pct, position_value=value, shares=shares, entry_price=price,
+                        stop_price=stop_price, stop_pct=stop_pct, max_loss_value=max_loss_value, conviction=conviction,
+                        binding_constraint=binding, rationale=rationale)
+
+
+def backtest_size_fraction(atr: float, realized_vol: float, score: float, profile: InvestorProfile,
+                           regime_size_multiplier: float = 1.0, mode: str = "vol_target") -> float:
+    """Fraction of the *sleeve* (capital earmarked for this stock) to invest when a signal fires.
+
+    mode="full"       : always 100% (shows raw signal quality)
+    mode="vol_target" : volatility targeting x regime multiplier (the sleeve-level rules; conviction and
+                        the portfolio caps are applied on top in the live position plan)
+    """
+    if mode == "full":
+        return 1.0
+    frac = 1.0
+    if realized_vol and np.isfinite(realized_vol) and realized_vol > 0:
+        frac = min(1.0, profile.target_vol / max(realized_vol, 0.05))
+    return float(np.clip(frac * regime_size_multiplier, 0.0, 1.0))
+
+
+# --------------------------------------------------------------------------- #
+# Assemble the decision
+# --------------------------------------------------------------------------- #
+def make_decision(ticker: str, as_of, price: float, atr: float, realized_vol: float,
+                  fundamental: Optional[float], technical: float, beacons: List[Beacon],
+                  regime: Optional[RegimeSnapshot], profile: InvestorProfile,
+                  params: Optional[StrategyParams] = None, warnings: Optional[List[str]] = None,
+                  sma_slow: Optional[float] = None) -> Decision:
+    p = params or StrategyParams()
+    adj = regime_adjustments(regime.is_bear if regime else False, regime.is_turbulent if regime else False, p)
+    score = composite_score(fundamental, technical, profile, adj["score_penalty"])
+    verdict = verdict_from_score(score)
+    warns = list(warnings or [])
+    if fundamental is None:
+        warns.append("Fundamental data unavailable: the score is technical-only and should be treated with extra caution.")
+    if adj["block_entries"] and verdict in {"Buy", "Strong Buy"}:
+        verdict = "Hold"
+        warns.append("Market is Bear / Turbulent: new entries are blocked by the regime rule, so the verdict is capped at Hold.")
+    plan = size_position(price, atr, realized_vol, score, verdict, profile, adj["size_multiplier"], sma_slow, p)
+    return Decision(ticker=ticker, as_of=str(as_of)[:10], price=float(price), profile=profile,
+                    fundamental_score=fundamental, technical_score=float(technical), regime=regime,
+                    regime_penalty=adj["score_penalty"], composite_score=score, verdict=verdict,
+                    beacons=beacons, plan=plan, warnings=warns)
