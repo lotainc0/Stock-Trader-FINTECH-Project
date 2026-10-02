@@ -27,10 +27,10 @@ and the reasons behind it**, then shows honestly how the rule behind that verdic
 
 ```bash
 pip install -r requirements.txt
+streamlit run app.py            # the web app (opens in your browser)
 python -m lighthouse analyze MSFT --horizon long --risk balanced --max-loss 2 --portfolio 25000 --out reports/MSFT --evaluate
 python -m lighthouse screen AAPL MSFT NVDA JPM XOM UNH
-streamlit run app.py            # point-and-click app
-python -m pytest                # 36 tests, runs offline
+python -m pytest                # 40 tests, runs offline
 ```
 
 ```python
@@ -42,6 +42,31 @@ r.backtest.summary()             # strategy vs buy & hold vs S&P 500
 ```
 
 No internet? Set `LIGHTHOUSE_OFFLINE=1` (or `--source sample`): the bundled pack holds real Microsoft OHLCV 1986-2017, 19 other S&P 500 stocks and the index to 2022.
+
+## The web app
+
+`streamlit run app.py` starts a point-and-click site with four tabs:
+
+| Tab | What you can do |
+|---|---|
+| **Analyse a stock** | verdict dial, score waterfall, position plan with a *what-if* sizer, 19 beacons you can filter by light and hover for the reason, a four-panel price / volume / RSI / MACD chart with range buttons and the backtested entries and exits, the backtest with drawdown and exposure, deep evaluation (layers, sensitivity heatmap, walk-forward), trade list, downloads |
+| **Rank & compare a watchlist** | presets or your own tickers, ranked bar chart, sortable table (select a row for a summary card and a one-click jump to the full analysis), rebased price comparison |
+| **Data behind the verdict** | where every number came from: price source and cleaning notes, the fundamental snapshot, every indicator row, market-weather history |
+| **How it works** | the method, verdict bands, risk presets, horizon weights and the full user guide |
+
+Every chart is interactive (hover, zoom, PNG download) and every table can be sorted; all numbers download as CSV or Markdown.
+The sidebar's *time machine* answers "what would Lighthouse have said on this date?". Keyboard focus is always visible and
+no information is carried by colour alone.
+
+### Put it online (free, 5 minutes)
+
+The app runs as-is on [Streamlit Community Cloud](https://share.streamlit.io):
+
+1. Sign in at https://share.streamlit.io with your GitHub account.
+2. *Create app* → *Deploy a public app from GitHub* → repository `lotainc0/Stock-Trader-FINTECH-Project`, branch `main`, main file `app.py`.
+3. Press *Deploy*. The first build installs `requirements.txt`; after that the app is live at a `*.streamlit.app` URL you can share.
+
+Live data comes from Yahoo Finance (with Stooq as a fallback); the bundled sample pack keeps the app working when a feed is down.
 
 ## Results in one table
 
@@ -74,14 +99,15 @@ lighthouse/            the product (pure Python, pandas/numpy/matplotlib)
   engine.py            analyze() pipeline and AnalysisResult
   screener.py          watchlist ranking
   report.py            Markdown report
-  charts.py            all charts
+  charts.py            static charts (CLI, report, notebook)
+  interactive.py       interactive Plotly charts (web app)
   __main__.py          CLI
-app.py                 Streamlit app
+app.py                 the web app (Streamlit + Plotly)
 notebooks/Lighthouse.ipynb   end-to-end Colab/Jupyter deliverable (built by scripts/build_notebook.py)
 data/sample/           bundled real historical data + an offline fundamentals fixture
 reports/examples/      example report, charts and the cross-ticker evaluation
 docs/                  EXECUTIVE_SUMMARY.md · METHODOLOGY.md · PITCH.md · USER_GUIDE.md
-tests/                 36 pytest tests (indicators, scoring, sizing, no-look-ahead, pipeline)
+tests/                 40 pytest tests (indicators, scoring, sizing, no-look-ahead, pipeline, app)
 ```
 
 ## Limitations

@@ -1,0 +1,16 @@
+# Streamlit theme and server settings for the Lighthouse app.
+# Colours match lighthouse/charts.py so the UI and the charts read as one system.
+
+[theme]
+base = "light"
+primaryColor = "#2a78d6"
+backgroundColor = "#fcfcfb"
+secondaryBackgroundColor = "#f1f0ec"
+textColor = "#0b0b0b"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true

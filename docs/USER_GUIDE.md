@@ -7,7 +7,7 @@ Lighthouse answers three questions about a stock for **you** specifically: *shou
 | | Best for | How |
 |---|---|---|
 | **Google Colab / Jupyter notebook** | the course deliverable; running end-to-end with narration | open `notebooks/Lighthouse.ipynb`, run all cells; change the inputs cell |
-| **Streamlit app** | non-programmers, live demos | `pip install -r requirements.txt` then `streamlit run app.py` |
+| **Web app** | everyone: interactive charts, watchlists, what-if sizing, downloads | `pip install -r requirements.txt` then `streamlit run app.py` (or the hosted Streamlit Cloud link in the README) |
 | **Command line** | power users, batch runs, saving reports | `python -m lighthouse analyze MSFT --horizon long --risk balanced --max-loss 2 --portfolio 25000 --out reports/MSFT --evaluate` |
 
 Other commands: `python -m lighthouse screen AAPL MSFT NVDA JPM --risk conservative --csv ranking.csv` and
