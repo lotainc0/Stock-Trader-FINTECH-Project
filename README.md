@@ -6,7 +6,7 @@ Lighthouse turns a ticker and four facts about **you** — horizon, risk toleran
 position, portfolio size — into a **Buy / Hold / Sell verdict, a position plan (shares, exit level, worst-case loss)
 and the reasons behind it**, then shows honestly how the rule behind that verdict would have behaved in the past.
 
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lotainc0/Stock-Trader-FINTECH-Project/blob/claude/compassionate-lamport-5gd8yf/notebooks/Lighthouse.ipynb)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lotainc0/Stock-Trader-FINTECH-Project/blob/main/notebooks/Lighthouse.ipynb)
 ![tests](https://github.com/lotainc0/Stock-Trader-FINTECH-Project/actions/workflows/ci.yml/badge.svg)
 
 | Why does MSFT score 73? | How did the rule behave? |
